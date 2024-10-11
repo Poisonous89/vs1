@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "1-zaciatok", "1-zaciatok\1-zaciatok.csproj", "{03C9CDE9-E5B0-4C4D-AE55-3B0F04764D72}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2-if", "2-if\2-if.csproj", "{088F1810-AF01-49AC-AAC7-732866EDCD48}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{03C9CDE9-E5B0-4C4D-AE55-3B0F04764D72}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03C9CDE9-E5B0-4C4D-AE55-3B0F04764D72}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03C9CDE9-E5B0-4C4D-AE55-3B0F04764D72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{088F1810-AF01-49AC-AAC7-732866EDCD48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{088F1810-AF01-49AC-AAC7-732866EDCD48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{088F1810-AF01-49AC-AAC7-732866EDCD48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{088F1810-AF01-49AC-AAC7-732866EDCD48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
