@@ -14,18 +14,21 @@ namespace _9._1_funkcie
               s opakovanim hodu pri cisle 6, hraci sa striedaju po hodoch a hrac vyhrava
             pri dosiahnut skore 100 */
 
+           
+            Console.WriteLine(hod());
+            Console.ReadLine();
         }
+
+
         static int hod() 
         {
-        Random r = new Random();
-            int c = r.Next(1, 7);
-            return c;
-        }
-        static void koc() 
-        {
-        int cc = hod();
-            if (cc == 6)
-
+            
+            int hod = r.Next(1, 7);
+            while (hod == 6)
+            {
+                hod =hod + r.Next(1, 7);
+            }
+            return hod;
         }
     }
 }
