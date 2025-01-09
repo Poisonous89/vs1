@@ -12,24 +12,30 @@ namespace e12
         static void Main(string[] args)
         {
             StreamReader subor = new StreamReader("C:\\Users\\Anony\\Documents\\e12.txt");
-            string[,] p = new string[5, 1, 2];
+            string[,,] p = new string[5, 1, 2];
+            int e = 0;
             int a = 0;
             int b = 0;
             int i = 0;
             while (true)
             {
                 string obsah = subor.ReadLine();
+                if (obsah == null)
+                    break;
+
                 if (string.IsNullOrWhiteSpace(obsah))
-                { continue; }
-                else
-                    if (a == 0
-                        b = 0;
-                else if  a % 2 == 0)
+                    continue;
+
+                if (e == 0)
+                    b = 0;
+                else if  (e % 2 == 0)
                     b = 0;
                 else
                     b = 1;
                 p[a, 0, b] = obsah;
-                a++;
+                if (b == 1)
+                    a++;
+                e++;
             }
             b = 0;
             while (i != 5)
@@ -38,12 +44,13 @@ namespace e12
                 if (b == 0)
                     b = 1;
                 else
-                    {
-                        i++;
-                        b = 0;
-                        Console.WriteLine("");
-                    }
+                {
+                    i++;
+                    b = 0;
+                    Console.WriteLine("");
+                }
             }
+            Console.ReadLine();
         }
     }
 }
