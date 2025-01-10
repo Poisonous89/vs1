@@ -11,7 +11,7 @@ namespace e12
     {
         static void Main(string[] args)
         {
-            StreamReader subor = new StreamReader("C:\\Users\\Anony\\Documents\\e12.txt");
+            StreamReader subor = new StreamReader("C:\\Users\\skutas23\\e12.txt");
             string[,,] p = new string[5, 1, 2];
             var listik = new List<string> { "0", "1", "2", "3", "4" };
             var zapis = new List<string>();
@@ -71,7 +71,7 @@ namespace e12
                 }
             }
             subor.Close();
-            File.WriteAllLines("C:\\Users\\Anony\\Documents\\e12.txt", zapis);
+            File.WriteAllLines("C:\\Users\\skutas23\\e12.txt", zapis);
             Console.ReadLine();
         }
     }
