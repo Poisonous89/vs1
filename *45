@@ -153,3 +153,61 @@ class Program
         Console.WriteLine("+------------+------------+----------------+");
     }
 }
+
+
+
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("Enter SPZ plates separated by spaces:");
+        string input = Console.ReadLine();
+        
+        var counts = CountSpzRegions(input);
+        
+        Console.WriteLine("\nSPZ Count by Region:");
+        foreach (var pair in counts)
+        {
+            Console.WriteLine($"{pair.Key}: {pair.Value}");
+        }
+    }
+    
+    static Dictionary<string, int> CountSpzRegions(string input)
+    {
+        var regions = new Dictionary<string, int>
+        {
+            {"KM", 0},
+            {"BB", 0},
+            {"KE", 0},
+            {"BA", 0},
+            {"ZA", 0},
+            {"ine", 0} // for all others
+        };
+        
+        if (string.IsNullOrWhiteSpace(input))
+            return regions;
+        
+        string[] plates = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        
+        foreach (string plate in plates)
+        {
+            if (plate.Length < 2) continue;
+            
+            string prefix = plate.Substring(0, 2).ToUpper();
+            
+            if (regions.ContainsKey(prefix))
+            {
+                regions[prefix]++;
+            }
+            else
+            {
+                regions["ine"]++;
+            }
+        }
+        
+        return regions;
+    }
+}
