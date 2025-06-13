@@ -61,3 +61,64 @@ class Program
 
 
 ZA-369-BE BA-369-BE ZA-123-AB BA-456-CD TT-789-EF ZA-999-XX BA-111-YY
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Zadajte SPZ značky oddelené medzerami:");
+        string input = Console.ReadLine();
+        
+        // Spracovanie vstupu
+        Dictionary<string, List<string>> sortedSpz = SortSpzByPrefix(input);
+        
+        // Výpis výsledkov
+        Console.WriteLine("\nZoradené SPZ značky podľa okresov:");
+        foreach (var category in sortedSpz.OrderBy(c => c.Key))
+        {
+            Console.WriteLine($"\nOkres {category.Key} (Počet SPZ: {category.Value.Count}):");
+            foreach (var spz in category.Value.OrderBy(s => s))
+            {
+                Console.WriteLine(spz);
+            }
+        }
+        
+        // Celkový počet
+        Console.WriteLine($"\nCelkový počet SPZ: {sortedSpz.Sum(c => c.Value.Count)}");
+        
+        Console.WriteLine("\nStlačte ľubovoľnú klávesu pre ukončenie...");
+        Console.ReadKey();
+    }
+    
+    static Dictionary<string, List<string>> SortSpzByPrefix(string input)
+    {
+        var result = new Dictionary<string, List<string>>();
+        
+        if (string.IsNullOrWhiteSpace(input))
+            return result;
+            
+        string[] spzArray = input.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+        
+        foreach (string spz in spzArray)
+        {
+            if (spz.Length < 2)
+                continue; // Preskočiť neplatné SPZ
+            
+            string prefix = spz.Substring(0, 2).ToUpper();
+            
+            if (!result.ContainsKey(prefix))
+            {
+                result[prefix] = new List<string>();
+            }
+            
+            result[prefix].Add(spz);
+        }
+        
+        return result;
+    }
+}
