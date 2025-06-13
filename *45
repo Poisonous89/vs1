@@ -63,6 +63,7 @@ class Program
 ZA-369-BE BA-369-BE ZA-123-AB BA-456-CD TT-789-EF ZA-999-XX BA-111-YY
 
 
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,37 +72,30 @@ class Program
 {
     static void Main(string[] args)
     {
+        Console.WriteLine("Analyzátor SPZ značiek");
         Console.WriteLine("Zadajte SPZ značky oddelené medzerami:");
+        Console.WriteLine("Príklad: BA-123-AA KE-456-BB BA-789-CC TT-321-DD");
+        
         string input = Console.ReadLine();
         
         // Spracovanie vstupu
-        Dictionary<string, List<string>> sortedSpz = SortSpzByPrefix(input);
+        var spzCounts = AnalyzeSpz(input);
         
-        // Výpis výsledkov
-        Console.WriteLine("\nZoradené SPZ značky podľa okresov:");
-        foreach (var category in sortedSpz.OrderBy(c => c.Key))
-        {
-            Console.WriteLine($"\nOkres {category.Key} (Počet SPZ: {category.Value.Count}):");
-            foreach (var spz in category.Value.OrderBy(s => s))
-            {
-                Console.WriteLine(spz);
-            }
-        }
-        
-        // Celkový počet
-        Console.WriteLine($"\nCelkový počet SPZ: {sortedSpz.Sum(c => c.Value.Count)}");
+        // Výpis výsledkov v tabuľke
+        PrintResults(spzCounts);
         
         Console.WriteLine("\nStlačte ľubovoľnú klávesu pre ukončenie...");
         Console.ReadKey();
     }
     
-    static Dictionary<string, List<string>> SortSpzByPrefix(string input)
+    static Dictionary<string, int> AnalyzeSpz(string input)
     {
-        var result = new Dictionary<string, List<string>>();
+        var result = new Dictionary<string, int>();
         
         if (string.IsNullOrWhiteSpace(input))
             return result;
             
+        // Rozdelenie vstupu podľa medzier
         string[] spzArray = input.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
         
         foreach (string spz in spzArray)
@@ -109,16 +103,53 @@ class Program
             if (spz.Length < 2)
                 continue; // Preskočiť neplatné SPZ
             
+            // Extrahovanie prvých 2 písmen
             string prefix = spz.Substring(0, 2).ToUpper();
             
-            if (!result.ContainsKey(prefix))
+            // Aktualizácia počítadla
+            if (result.ContainsKey(prefix))
             {
-                result[prefix] = new List<string>();
+                result[prefix]++;
             }
-            
-            result[prefix].Add(spz);
+            else
+            {
+                result[prefix] = 1;
+            }
         }
         
         return result;
+    }
+    
+    static void PrintResults(Dictionary<string, int> spzCounts)
+    {
+        if (spzCounts.Count == 0)
+        {
+            Console.WriteLine("\nNeboli nájdené žiadne platné SPZ značky.");
+            return;
+        }
+        
+        // Vypočítanie celkového počtu
+        int total = spzCounts.Sum(x => x.Value);
+        
+        // Hlavička tabuľky
+        Console.WriteLine("\nVýsledky analýzy SPZ značiek:");
+        Console.WriteLine("+------------+------------+----------------+");
+        Console.WriteLine("|  Okres     | Počet SPZ  | Podiel (%)     |");
+        Console.WriteLine("+------------+------------+----------------+");
+        
+        // Zoradenie výsledkov podľa počtu SPZ zostupne
+        var sortedResults = spzCounts.OrderByDescending(x => x.Value);
+        
+        // Riadky tabuľky
+        foreach (var item in sortedResults)
+        {
+            double percentage = Math.Round((item.Value * 100.0) / total, 2);
+            Console.WriteLine($"| {item.Key,-10} | {item.Value,-10} | {percentage,-14} |");
+        }
+        
+        // Päta tabuľky
+        Console.WriteLine("+------------+------------+----------------+");
+        Console.WriteLine($"| Celkom     | {total,-10} | 100%           |");
+        Console.WriteLine("+------------+------------+----------------+");
     }
 }
