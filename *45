@@ -211,3 +211,76 @@ class Program
         return regions;
     }
 }
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+
+        string input = "BA-582NR, KE-013XZ, BB-759HF, ZA-206KV, KM-804LR, KE-741DA, BB-394PU, ZA-840RM, KM-127CK, BA-495SM,  KM-309TY, BB-178XJ, KM-610ZV, ZA-012WF, KE-836BC,  KM-653NV, BA-093LU, ZA-584TA, KE-229GF, BB-740DK,  KM-902BJ, KE-005RA, KM-348SC, BA-737KP, ZA-961LM,  KM-174ZD, BA-308PX, KM-170WO, BB-581TL, ZA-408CS,  KM-012GP, BA-610HQ, BB-499AJ, BB-066BE, ZA-325FU,  KE-187RX, BB-913TC, BB-230YS, KM-541HW, ZA-674OX,  KM-787UD, BA-442JI, BB-179ZW, KE-520AV, ZA-091KN,  KM-663BR, KE-308YL, BB-008TV, BA-134NE, ZA-726MW,  KM-932DP, BB-697AX, BA-583JG, KE-400SB, ZA-120HF,  KM-351QE, BA-246KT, BB-829RU, KE-989OM, ZA-688ZD,  BA-300VL, KE-473TP, BB-019EY, KM-117CA, ZA-512NU,  KM-028JS, BA-929YG, KE-756BE, BB-344LT, ZA-615QX,  KM-471FK, BA-351UZ, BB-109SW, ZA-829RM, KE-208GRTN-394XR, NR-582LM, RK-071VD, TT-326JF, MI-204QP,  PD-839YU, SC-113KE, PO-698BW, To-907TX, TO-021HJ,  DK-459VA, SL-370QW, NZ-602PY, NZ-184CJ, TO-905KR,  SE-274LN, CA-148UW, IL-708ZX, PK-617ED, HE-042MJ,  LE-519GU, KN-846RQ, NO-783AX";
+
+        var spzCounts = AnalyzeSpz(input);
+
+        PrintResults(spzCounts);
+        Console.ReadLine();
+
+    }
+
+    static Dictionary<string, int> AnalyzeSpz(string input)
+    {
+        var result = new Dictionary<string, int>();
+
+        if (string.IsNullOrWhiteSpace(input))
+            return result;
+
+        // Rozdelenie vstupu podľa medzier
+        string[] spzArray = input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (string spz in spzArray)
+        {
+            if (spz.Length < 2)
+                continue; // Preskočiť neplatné SPZ
+
+            // Extrahovanie prvých 2 písmen
+            string prefix = spz.Substring(0, 2).ToUpper();
+
+            // Aktualizácia počítadla
+            if (result.ContainsKey(prefix))
+            {
+                result[prefix]++;
+            }
+            else
+            {
+                result[prefix] = 1;
+            }
+        }
+
+        return result;
+    }
+
+    static void PrintResults(Dictionary<string, int> spzCounts)
+    {
+
+        // Vypočítanie celkového počtu
+        int total = spzCounts.Sum(x => x.Value);
+
+        // Hlavička tabuľky
+        Console.WriteLine("-----------------");
+        Console.WriteLine("| OKRES | POČET |");
+        Console.WriteLine("-----------------");
+
+        // Zoradenie výsledkov podľa počtu SPZ zostupne
+        var sortedResults = spzCounts.OrderByDescending(x => x.Value);
+
+        // Riadky tabuľky
+        foreach (var item in sortedResults)
+        {
+            double percentage = Math.Round((item.Value * 100.0) / total, 2);
+            Console.WriteLine($"|  {item.Key}   |  {item.Value}    |");
+        }
+    }
+}
