@@ -105,3 +105,113 @@ void loop() {
     while (digitalRead(buttonPin) == LOW); // počkaj na uvoľnenie tlačidla
   }
 }
+
+
+
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+// 7-segmentové piny (A–G)
+int segA = 2;
+int segB = 3;
+int segC = 4;
+int segD = 5;
+int segE = 6;
+int segF = 7;
+int segG = 8;
+
+int buttonPin = 9;
+int last = -1;
+
+// 2D pole kariet: {písmeno, číslo}
+char cards[4][2] = {
+  {'A', '1'},
+  {'J', '2'},
+  {'Q', '3'},
+  {'K', '4'}
+};
+
+void setup() {
+  lcd.init();
+  lcd.backlight();
+  Serial.begin(9600);
+
+  pinMode(segA, OUTPUT);
+  pinMode(segB, OUTPUT);
+  pinMode(segC, OUTPUT);
+  pinMode(segD, OUTPUT);
+  pinMode(segE, OUTPUT);
+  pinMode(segF, OUTPUT);
+  pinMode(segG, OUTPUT);
+
+  pinMode(buttonPin, INPUT_PULLUP);
+  randomSeed(analogRead(A0));
+
+  lcd.print("Stlac tlacidlo");
+}
+
+void loop() {
+  if (digitalRead(buttonPin) == LOW) {
+    delay(200); // debounce
+
+    int i;
+    do i = random(4); while (i == last);
+    last = i;
+
+    char card = cards[i][0];
+    char num = cards[i][1];
+
+    lcd.clear();
+    lcd.print("Karta: ");
+    lcd.print(card);
+    Serial.print("Karta: ");
+    Serial.println(card);
+
+    showNumber(num);
+
+    while (digitalRead(buttonPin) == LOW); // caka kym pusti tlacidlo
+  }
+}
+
+void clearSegments() {
+  digitalWrite(segA, LOW);
+  digitalWrite(segB, LOW);
+  digitalWrite(segC, LOW);
+  digitalWrite(segD, LOW);
+  digitalWrite(segE, LOW);
+  digitalWrite(segF, LOW);
+  digitalWrite(segG, LOW);
+}
+
+void showNumber(char n) {
+  clearSegments();
+
+  switch (n) {
+    case '1': // 1
+      digitalWrite(segB, HIGH);
+      digitalWrite(segC, HIGH);
+      break;
+    case '2': // 2
+      digitalWrite(segA, HIGH);
+      digitalWrite(segB, HIGH);
+      digitalWrite(segD, HIGH);
+      digitalWrite(segE, HIGH);
+      digitalWrite(segG, HIGH);
+      break;
+    case '3': // 3
+      digitalWrite(segA, HIGH);
+      digitalWrite(segB, HIGH);
+      digitalWrite(segC, HIGH);
+      digitalWrite(segD, HIGH);
+      digitalWrite(segG, HIGH);
+      break;
+    case '4': // 4
+      digitalWrite(segB, HIGH);
+      digitalWrite(segC, HIGH);
+      digitalWrite(segF, HIGH);
+      digitalWrite(segG, HIGH);
+      break;
+  }
+}
