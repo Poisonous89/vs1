@@ -1,88 +1,49 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
-// LCD 16x2 na I2C adrese 0x27 (ak nefunguje, skúsiť 0x3F)
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-// Mapovanie segmentov A–G
-const int segmentPins[7] = {2, 3, 4, 5, 6, 7, 8};
-
-// Definícia číslic (A,B,C,D,E,F,G)
-const byte digits[5][7] = {
-  // 0: (nepoužité)
-  {0,0,0,0,0,0,1},
-  // 1: A
-  {1,1,1,1,1,1,0}, // "1" -> všetky segmenty okrem G
-  // 2: J
-  {0,1,1,1,1,1,1}, // 2
-  // 3: Q
-  {1,1,1,1,0,0,1}, // 3
-  // 4: K
-  {1,1,1,0,0,1,1}  // 4
+int segPins[7] = {2, 3, 4, 5, 6, 7, 8};
+byte segPatterns[4][7] = {
+  {1,1,1,1,1,1,0}, // 1 (A)
+  {0,1,1,1,1,1,1}, // 2 (J)
+  {1,1,1,1,0,0,1}, // 3 (Q)
+  {1,1,1,0,0,1,1}  // 4 (K)
 };
+char cards[4] = {'A', 'J', 'Q', 'K'};
 
-const char cards[4] = {'A', 'J', 'Q', 'K'};
-const int numbers[4] = {1, 2, 3, 4};
-
-int lastIndex = -1;
-const int buttonPin = 9;
+int buttonPin = 9;
+int last = -1;
 
 void setup() {
-  Serial.begin(9600);
   lcd.init();
   lcd.backlight();
+  Serial.begin(9600);
 
-  // Nastavenie segmentov
-  for (int i = 0; i < 7; i++) {
-    pinMode(segmentPins[i], OUTPUT);
-    digitalWrite(segmentPins[i], LOW);
-  }
-
+  for (int i = 0; i < 7; i++) pinMode(segPins[i], OUTPUT);
   pinMode(buttonPin, INPUT_PULLUP);
 
-  // Iniciálna náhodnosť
-  randomSeed(analogRead(0));
-
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Stlac tlacidlo");
+  randomSeed(analogRead(A0));
+  lcd.print("Press button");
 }
 
 void loop() {
   if (digitalRead(buttonPin) == LOW) {
     delay(200); // debounce
 
-    int newIndex;
-    do {
-      newIndex = random(0, 4);
-    } while (newIndex == lastIndex);
-    lastIndex = newIndex;
+    int i;
+    do i = random(4); while (i == last);
+    last = i;
 
-    char card = cards[newIndex];
-    int number = numbers[newIndex];
-
-    // Vypis na Serial a LCD
-    Serial.print("Karta: ");
-    Serial.println(card);
+    char c = cards[i];
     lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Karta: ");
-    lcd.print(card);
+    lcd.print("Card: ");
+    lcd.print(c);
+    Serial.println(c);
 
-    // Zobraz cislo na 7-seg
-    showDigit(number);
+    for (int j = 0; j < 7; j++)
+      digitalWrite(segPins[j], segPatterns[i][j]);
 
-    // Pockaj kym pustis tlacidlo
-    while (digitalRead(buttonPin) == LOW);
-  }
-}
-
-void showDigit(int num) {
-  // zhasni všetky
-  for (int i = 0; i < 7; i++) digitalWrite(segmentPins[i], LOW);
-  
-  // zapni podľa tabuľky
-  for (int i = 0; i < 7; i++) {
-    digitalWrite(segmentPins[i], digits[num][i]);
+    while (digitalRead(buttonPin) == LOW); // wait for release
   }
 }
