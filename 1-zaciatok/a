@@ -264,3 +264,101 @@ void loop()
       lcd.print("NEUHADOL");
     delay(1000);
 }
+
+
+
+
+
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+// Inicializácia I2C LCD (adresa 0x27, 16 stĺpcov, 2 riadky)
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+volatile int currentPower = 0; 
+volatile bool updateFlag = false;
+
+void setup() {
+  Serial.begin(9600);
+  
+  // Inicializácia displeja
+  lcd.init();
+  lcd.backlight();
+  
+  // Nastavenie pinov D4 až D7 ako vstupy s interným PULL-UP rezistorom
+  pinMode(4, INPUT_PULLUP);
+  pinMode(5, INPUT_PULLUP);
+  pinMode(6, INPUT_PULLUP);
+  pinMode(7, INPUT_PULLUP);
+  
+  // Počiatočné načítanie stavu tlačidiel
+  int count = 0;
+  if (!(PIND & (1 << PIND4))) count++;
+  if (!(PIND & (1 << PIND5))) count++;
+  if (!(PIND & (1 << PIND6))) count++;
+  if (!(PIND & (1 << PIND7))) count++;
+  currentPower = count * 25;
+
+  // Nastavenie PCINT pre Port D (piny D0 až D7)
+  // PCIE2 povoľuje prerušenia pre PCINT[23:16]
+  PCICR |= (1 << PCIE2);
+  
+  // PCMSK2 nastavuje masku pre konkrétne piny: PCINT20, 21, 22, 23 (zodpovedajú D4, D5, D6, D7)
+  PCMSK2 |= (1 << PCINT20) | (1 << PCINT21) | (1 << PCINT22) | (1 << PCINT23);
+  
+  // Vynútené prvé zobrazenie na displeji a v termináli
+  updateDisplay();
+}
+
+void loop() {
+  // Ak nastala zmena stavu vo vnútri prerušenia, aktualizujeme displej a sériovú linku
+  if (updateFlag) {
+    updateDisplay();
+  }
+}
+
+// Obslužná rutina prerušenia pre piny na Port D
+ISR(PCINT2_vect) {
+  int count = 0;
+  
+  // Kontrola stavu pinov. Tlačidlá spínajú na GND, takže stlačené = LOW (0)
+  if (!(PIND & (1 << PIND4))) count++;
+  if (!(PIND & (1 << PIND5))) count++;
+  if (!(PIND & (1 << PIND6))) count++;
+  if (!(PIND & (1 << PIND7))) count++;
+  
+  int newPower = count * 25;
+  
+  // Ak sa celkový výkon zmenil, zaznamenáme to a nastavíme vlajku pre aktualizáciu
+  if (newPower != currentPower) {
+    currentPower = newPower;
+    updateFlag = true;
+  }
+}
+
+// Funkcia pre výpis výkonu
+void updateDisplay() {
+  // Bezpečné skopírovanie hodnoty pre prípad, že by počas výpisu nastalo ďalšie prerušenie
+  int powerCopy;
+  noInterrupts();
+  powerCopy = currentPower;
+  updateFlag = false;
+  interrupts();
+  
+  // 1. Výpis do sériového terminálu (vypíše sa len pri zmene vďaka podmienke v ISR)
+  Serial.print("Vykon = ");
+  Serial.print(powerCopy);
+  Serial.println("%");
+  
+  // 2. Aktualizácia LCD displeja
+  lcd.clear();
+  int numChars = (powerCopy / 25) * 4;
+  
+  // Vypísanie príslušného počtu znakov v oboch riadkoch
+  for (int i = 0; i < numChars; i++) {
+    lcd.setCursor(i, 0);
+    lcd.write(10); // Použitie znaku presne podľa zadania
+    lcd.setCursor(i, 1);
+    lcd.write(10);
+  }
+}
